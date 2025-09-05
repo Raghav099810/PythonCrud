@@ -1,8 +1,8 @@
 from bson import ObjectId
 from database import students_collection
-from datetime import datetime
 from utils.student_utils import now
 from typing import List
+from pymongo import ReturnDocument
 
 currentTime = now()
 
@@ -15,9 +15,17 @@ def create_student(student_data: dict):
     return student_data
 
 
-def get_all_students():
+def get_all_students(search: str = None):
+    query = {}
+    if search:
+        query = {
+            "$or": [
+                {"name": {"$regex": search, "$options": 'i'}},
+                {"grade": {"$regex": search, "$options": 'i'}}
+            ]
+        }
     student = []
-    for stu in students_collection.find():
+    for stu in students_collection.find(query):
         stu["_id"] = str(stu["_id"])
         student.append(stu)
 
@@ -32,31 +40,18 @@ def get_particular_student(student_id: str):
     return student
 
 
-def update_student(student_id: str, update_student: dict):
-    update_student['updated_at'] = currentTime
-    result = students_collection.update_one(
+def update_student(student_id: str, update_student_data: dict):
+    update_student_data['updated_at'] = currentTime
+    result = students_collection.find_one_and_update(
         {"_id": ObjectId(student_id)},
-        {"$set": update_student}
+        {"$set": update_student_data},
+        return_document=ReturnDocument.AFTER
     )
-    return result.modified_count > 0
+    if result:
+        result["_id"] = str(result["_id"])
+    return result
 
 
 def delete_student(student_id: str):
-    result = students_collection.delete_one({"_id": student_id})
+    result = students_collection.delete_one({"_id": ObjectId(student_id)})
     return result.deleted_count > 0
-
-
-def search_student(query: str) -> List[dict]:
-    result = students_collection.find({
-        "$or": [
-            {"name": {"$regex": query, "$options": 'i'}},
-            {"grade": {"$regex": query, "$options": "i"}}
-        ]
-    })
-
-    student = []
-    for stu in result:
-        stu["_id"] = str(stu["_id"])
-        student.append(stu)
-
-    return student

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 import constants.student_constants as status_code
 from services.student_services import (
     create_student,
@@ -6,10 +6,9 @@ from services.student_services import (
     get_particular_student,
     update_student,
     delete_student,
-    search_student
 )
 from schemas import StudentCreate, Student, BaseResponse
-from typing import List
+from fastapi_pagination import Page, paginate, Params
 
 router = APIRouter(prefix="/student", tags=Student)
 
@@ -28,15 +27,17 @@ def create(student: StudentCreate) -> BaseResponse[Student]:
     )
 
 
-def get_all() -> BaseResponse[List[Student]]:
-    students = get_all_students()
+def get_all(params: Params = Depends(), search: str = None) -> BaseResponse[Page[Student]]:
+    students = get_all_students(search=search)
     if not students:
         raise HTTPException(
             status_code=status_code.HTTP_NOT_FOUND,
             detail="No student data found"
         )
-    return BaseResponse[List[Student]](
-        data=[Student(**stu) for stu in students],
+    paginated_student_data = paginate(
+        [Student(**stu) for stu in students], params=params)
+    return BaseResponse[Page[Student]](
+        data=paginated_student_data,
         message="Data returned successfully",
         statusCode=status_code.HTTP_OK
     )
@@ -58,13 +59,13 @@ def get_particular(student_id: str) -> BaseResponse[Student]:
 
 def update(student_id: str, student: StudentCreate) -> BaseResponse[Student]:
     updated = update_student(student_id=student_id,
-                             update_student=student.dict())
+                             update_student_data=student.dict())
     if not updated:
         raise HTTPException(
             status_code=status_code.HTTP_BAD_REQUEST,
             detail="Cannot update the student"
         )
-    return BaseResponse[None](
+    return BaseResponse[Student](
         data=Student(**updated),
         message="Student updated successfully",
         statusCode=status_code.HTTP_ACCEPTED
@@ -81,18 +82,5 @@ def delete(student_id: str) -> BaseResponse[None]:
     return BaseResponse[None](
         data=None,
         message="Student deleted successfully",
-        statusCode=status_code.HTTP_OK
-    )
-
-
-def search(query: str) -> BaseResponse[Student]:
-    student_result = search_student(query=query)
-    if not student_result:
-        raise HTTPException(
-            status_code=status_code.HTTP_NOT_FOUND, detail="No such student found")
-
-    return BaseResponse[List[Student]](
-        data=[Student(**stu) for stu in student_result],
-        message="Search successful",
         statusCode=status_code.HTTP_OK
     )

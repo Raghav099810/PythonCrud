@@ -1,7 +1,8 @@
 from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 from typing import Generic, TypeVar, Optional
-from utils.student_utils import validateAge, validateDob, validateName
+from utils.student_utils import validateAge, validateName
+from fastapi_pagination import Page
 
 
 class StudentInfoClass(BaseModel):
