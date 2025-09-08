@@ -1,6 +1,6 @@
 from fastapi import Depends, Query
 from controllers import student_controllers
-from schemas import Student, StudentCreate, BaseResponse
+from schemas import Student, StudentCreate, BaseResponse, StudentResponse
 from fastapi_pagination import Page, Params
 from utils.router_config import create_router
 
@@ -12,12 +12,12 @@ def create_student_route(student: StudentCreate):
     return student_controllers.create(student=student)
 
 
-@student_routes.get("", response_model=BaseResponse[Page[Student]])
+@student_routes.get("", response_model=BaseResponse[Page[StudentResponse]])
 def get_all_students_route(params: Params = Depends(), search: str = Query(None, description="Search for student")):
     return student_controllers.get_all(params=params, search=search)
 
 
-@student_routes.get("/{student_id}", response_model=BaseResponse[Student])
+@student_routes.get("/{student_id}", response_model=BaseResponse[StudentResponse])
 def get_student_route(student_id: str):
     return student_controllers.get_particular(student_id=student_id)
 

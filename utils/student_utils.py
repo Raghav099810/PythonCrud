@@ -16,6 +16,12 @@ def validateName(name: str) -> str:
     if (len(name.strip()) > 20):
         raise ValueError("Name is too much lengthy")
 
+    if (len(name) == 0):
+        raise ValueError("Name cannot be empty")
+
+    if not name.isalpha:
+        raise ValueError("Cannot enter number or special expressions")
+
     return name
 
 

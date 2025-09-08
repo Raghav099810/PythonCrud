@@ -7,7 +7,7 @@ from services.student_services import (
     update_student,
     delete_student,
 )
-from schemas import StudentCreate, Student, BaseResponse
+from schemas import StudentCreate, Student, BaseResponse, StudentResponse
 from fastapi_pagination import Page, paginate, Params
 
 router = APIRouter(prefix="/student", tags=Student)
@@ -27,7 +27,7 @@ def create(student: StudentCreate) -> BaseResponse[Student]:
     )
 
 
-def get_all(params: Params = Depends(), search: str = None) -> BaseResponse[Page[Student]]:
+def get_all(params: Params = Depends(), search: str = None) -> BaseResponse[Page[StudentResponse]]:
     students = get_all_students(search=search)
     if not students:
         raise HTTPException(
@@ -35,23 +35,23 @@ def get_all(params: Params = Depends(), search: str = None) -> BaseResponse[Page
             detail="No student data found"
         )
     paginated_student_data = paginate(
-        [Student(**stu) for stu in students], params=params)
-    return BaseResponse[Page[Student]](
+        [StudentResponse(**stu) for stu in students], params=params)
+    return BaseResponse[Page[StudentResponse]](
         data=paginated_student_data,
         message="Data returned successfully",
         statusCode=status_code.HTTP_OK
     )
 
 
-def get_particular(student_id: str) -> BaseResponse[Student]:
+def get_particular(student_id: str) -> BaseResponse[StudentResponse]:
     student = get_particular_student(student_id=student_id)
     if not student:
         raise HTTPException(
             status_code=status_code.HTTP_NOT_FOUND,
             detail="Student detail not found"
         )
-    return BaseResponse[Student](
-        data=Student(**student),
+    return BaseResponse[StudentResponse](
+        data=StudentResponse(**student),
         message="Student returned successfully",
         statusCode=status_code.HTTP_OK
     )

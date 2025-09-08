@@ -30,6 +30,12 @@ class Student(StudentInfoClass):
     updated_at: datetime | None = None
 
 
+class StudentResponse(StudentInfoClass):
+    id: str = Field(..., alias="_id")
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
 # Base Response Model
 T = TypeVar("T")
 
