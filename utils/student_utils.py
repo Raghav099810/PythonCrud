@@ -1,4 +1,5 @@
 from datetime import datetime
+from bson import ObjectId
 
 
 def now():
@@ -10,9 +11,6 @@ def validateName(name: str) -> str:
         raise ValueError("Name must be atlest 3 characters long")
     if (name.startswith(" ")):
         raise ValueError("Name cannot have space before")
-    if (name.startswith(" ")):
-        raise ValueError("Remove trailing spaces")
-
     if (len(name.strip()) > 20):
         raise ValueError("Name is too much lengthy")
 
@@ -35,3 +33,7 @@ def validateDob(dob: datetime):
     if (dob > datetime.now()):
         raise ValueError("Enter valid dob")
     return dob
+
+
+def validate_id(student_id: str):
+    return ObjectId.is_valid(student_id)

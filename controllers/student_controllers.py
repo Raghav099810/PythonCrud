@@ -9,6 +9,7 @@ from services.student_services import (
 )
 from schemas import StudentCreate, Student, BaseResponse, StudentResponse
 from fastapi_pagination import Page, paginate, Params
+from utils.student_utils import validate_id
 
 router = APIRouter(prefix="/student", tags=Student)
 
@@ -44,6 +45,12 @@ def get_all(params: Params = Depends(), search: str = None) -> BaseResponse[Page
 
 
 def get_particular(student_id: str) -> BaseResponse[StudentResponse]:
+    if validate_id(student_id=student_id):
+        raise HTTPException(
+            status_code=status_code.HTTP_BAD_REQUEST,
+            detail="Invalid student id"
+        )
+
     student = get_particular_student(student_id=student_id)
     if not student:
         raise HTTPException(
@@ -73,6 +80,11 @@ def update(student_id: str, student: StudentCreate) -> BaseResponse[Student]:
 
 
 def delete(student_id: str) -> BaseResponse[None]:
+    if validate_id(student_id=student_id) is False:
+        raise HTTPException(
+            status_code=status_code.HTTP_BAD_REQUEST,
+            detail="Invalid student id"
+        )
     deleted = delete_student(student_id=student_id)
     if not deleted:
         raise HTTPException(

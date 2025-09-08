@@ -1,7 +1,6 @@
 from bson import ObjectId
 from database import students_collection
 from utils.student_utils import now
-from typing import List
 from pymongo import ReturnDocument
 
 currentTime = now()
