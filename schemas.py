@@ -2,15 +2,15 @@ from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 from typing import Generic, TypeVar, Optional
 from utils.student_utils import validateAge, validateName
-from fastapi_pagination import Page
 
 
 class StudentInfoClass(BaseModel):
     name: str = Field(..., description="Enter name")
     age: int = Field(..., description="Enter age")
-    grade: str = Field(..., min_length=2, max_length=3,
-                       description="Enter valid grade")
-    dob: datetime
+    standard: Optional[str] = Field(
+        None, description="Enter grade/standard")
+    dob: Optional[datetime] = Field(
+        None, description="Date of birth")
 
     @field_validator("name")
     def validate_name(cls, v):

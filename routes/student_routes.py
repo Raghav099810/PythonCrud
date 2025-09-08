@@ -1,18 +1,18 @@
-from fastapi import Query, Depends
+from fastapi import Depends, Query
 from controllers import student_controllers
 from schemas import Student, StudentCreate, BaseResponse
 from fastapi_pagination import Page, Params
 from utils.router_config import create_router
 
-student_routes = create_router(prefix="/students", tags=["Students"])
+student_routes = create_router(prefix="", tags=["Students"])
 
 
-@student_routes.post("/", response_model=BaseResponse[Student])
+@student_routes.post("", response_model=BaseResponse[Student])
 def create_student_route(student: StudentCreate):
     return student_controllers.create(student=student)
 
 
-@student_routes.get("/search", response_model=BaseResponse[Page[Student]])
+@student_routes.get("", response_model=BaseResponse[Page[Student]])
 def get_all_students_route(params: Params = Depends(), search: str = Query(None, description="Search for student")):
     return student_controllers.get_all(params=params, search=search)
 

@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 
-MONGO_URL = "mongodb+srv://raghav:raghav12@cluster0.ej7rq6n.mongodb.net/studentsdb"
+MONGO_URL = "mongodb+srv://raghav:raghav12@cluster0.ej7rq6n.mongodb.net/school_db"
 
 try:
     client = MongoClient(MONGO_URL)
